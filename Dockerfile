@@ -12,11 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM python:2.7.10
+FROM ubuntu
 MAINTAINER Kirsten Hunter (khunter@akamai.com)
 RUN apt-get update
-RUN apt-get install -y curl patch gawk g++ gcc make libc6-dev patch libreadline6-dev zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake libtool bison pkg-config libffi-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q libssl-dev python-all wget vim python-pip php5 php5-curl ruby-dev nodejs-dev npm php-pear php5-dev ruby perl5 
+RUN apt-get install -y curl patch gawk g++ gcc make libc6-dev patch libreadline6-dev zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake libtool bison pkg-config libffi-dev software-properties-common 
+RUN add-apt-repository -y ppa:longsleep/golang-backports
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q libssl-dev python-all wget vim python-pip php php-curl ruby-dev nodejs-dev npm php-pear php-dev ruby perl golang-go git
 RUN pip install httpie-edgegrid 
 ADD ./examples /opt/examples
 ADD ./contrib/python /opt/examples/python/contrib
@@ -29,12 +31,17 @@ RUN gem install akamai-edgegrid
 WORKDIR /opt/examples/node
 RUN npm install
 RUN npm install -g n; n 7.0.0
-WORKDIR /opt
-RUN mkdir /opt/bin
-RUN wget https://github.com/akamai/cli/releases/download/0.1.0/akamai-0.1.0-linuxamd64
-RUN cp akamai-0.1.0-linuxamd64 /usr/local/bin/akamai
+RUN mkdir /goopt
+ENV GOPATH=/goopt
+RUN go get github.com/akamai/cli
+WORKDIR /goopt/src/github.com/akamai/cli
+ENV PATH=${PATH}:/goopt/bin
+RUN curl https://glide.sh/get | sh
+RUN glide install
+RUN go build -o akamai . && mv akamai /usr/local/bin 
 RUN chmod 755 /usr/local/bin/akamai
-RUN /usr/local/bin/akamai get property
+RUN /usr/local/bin/akamai install property
+RUN /usr/local/bin/akamai install purge
 WORKDIR /opt/examples/python
 RUN python /opt/examples/python/tools/setup.py install
 RUN cpan -i Akamai::Edgegrid LWP::Protocol::https
