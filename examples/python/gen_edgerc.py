@@ -41,11 +41,14 @@ parser = argparse.ArgumentParser(description='After authorizing your client \
 	them with this script.')
 parser.add_argument('--config_section', '-s', action='store', 
 	help='create new config section with this section name.')
+parser.add_argument('--alt_section', '-a', action='store')
 parser.add_argument('--cred_file', '-f', action='store', 
 	help='use the exported file from the OPEN API Administration tool.')
 args= parser.parse_args()
 
 # Determine the section name giving precedence to -s value
+if args.alt_section:
+	args.config_section = args.alt_section
 if args.config_section:
 	section_name = args.config_section
 	section_name_pretty = args.config_section
