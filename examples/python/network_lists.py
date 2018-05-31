@@ -79,7 +79,7 @@ def _get_network_lists():
 	return events_result
 
 def _create_network_list(name,ips):
-	print('Creating a network list %s for ip addresses %s' % (name, json.dumps(ips)))
+	print('Creating a network list {} for ip addresses {}'.format(name, json.dumps(ips)))
 	headers = {'Content-Type': 'application/json'}
 	path = '/network-list/v1/network_lists'
 	data_obj = {
@@ -88,7 +88,7 @@ def _create_network_list(name,ips):
 		'list' : ips
 	}
 	
-	httpCaller.postResult(urljoin(baseurl,path), json.dumps(data_obj))
+	httpCaller.postResult(urljoin(baseurl, path), json.dumps(data_obj))
 
 def main():
     _init()
