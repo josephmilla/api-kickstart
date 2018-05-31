@@ -97,7 +97,7 @@ def main():
     lists = _get_network_lists()['network_lists']
     
     def _mapper(x):
-        print(str(x['numEntries']) + ', ' + x['name'])
+        print('{}, {}'.format(str(x['numEntries']), x['name']))
         
     map(_mapper, lists)
     #_create_network_list('test',['1.2.3.4'])
